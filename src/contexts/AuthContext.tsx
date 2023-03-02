@@ -43,13 +43,12 @@ type AuthContextData = {
 };
 
 export const AuthContext = createContext({} as AuthContextData);
-const cookies = new Cookies();
 
 export function signOut() {
+  const cookies = new Cookies();
+
   cookies.remove('agenda.token');
   cookies.remove('user.id');
-
-  localStorage.clear();
 
   const navigate = useNavigate();
   navigate('/');
@@ -74,7 +73,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         .then((response) => {
           const { id, login, activities } = response.data;
 
-          localStorage.setItem('userId', id);
+          localStorage.setItem('userActivities', id);
 
           setUser({
             id,

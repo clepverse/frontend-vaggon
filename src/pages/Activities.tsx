@@ -1,6 +1,6 @@
 import { FormEvent, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
+import { AuthContext, signOut } from '../contexts/AuthContext';
 
 import {
   Box,
@@ -10,12 +10,13 @@ import {
   Heading,
   HStack,
   Input,
+  Link,
   SimpleGrid,
   VStack,
 } from '@chakra-ui/react';
 
 import Cookies from 'universal-cookie';
-
+import { Logo } from '../components/Logo';
 import CalendarEvents from '../components/CalendarEvents';
 import { api } from '../services/api';
 import { toast } from 'react-toastify';
@@ -80,31 +81,26 @@ export function Activities() {
       localStorage.clear();
       navigate('/');
     }
-
-    getData().then(({ data }) => {
-      const newData = data;
-      // console.log({ data });
-      setActivities(newData);
-    });
-
-    // getData();
   }, []);
+
+  console.log(user);
 
   return (
     <div>
       <Box>
         <Flex w="100%" my="6" maxWidth={1480} mx="auto" px="6" flexDirection={'column'}>
           <Button
-            onClick={(e) => {
-              cookies.remove('agenda.token');
-              cookies.remove('user.id');
-              localStorage.clear();
-              navigate('/');
-            }}
-            my="8"
+            type="submit"
+            my="6"
             colorScheme="pink"
             size="lg"
-            w={'6rem'}
+            width={'6rem'}
+            onClick={(e) => {
+              navigate('/');
+              localStorage.clear();
+              cookies.remove('agenda.token');
+              cookies.remove('user.id');
+            }}
           >
             Sign Out
           </Button>
@@ -170,12 +166,17 @@ export function Activities() {
             </Flex>
           </Box>
         </Flex>
-        <Flex justifyContent={'center'}>
-          <pre>{JSON.stringify(activities, null, 2)}</pre>
-        </Flex>
-        {/* <div>{getData().then((response) => { })}</div> */}
-        {/* <CalendarEvents events={events} /> */}
       </Box>
+      <Flex justifyContent={'center'}>
+        <pre>{JSON.stringify(user, null, 2)}</pre>
+        {/* <div>
+          {user.activities.map((item) => {
+            return <div>{item.name}</div>;
+          })}
+        </div> */}
+      </Flex>
+
+      <CalendarEvents events={events} />
     </div>
   );
 }
