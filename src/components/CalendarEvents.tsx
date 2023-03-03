@@ -27,6 +27,7 @@ import { api } from '../services/api';
 import { toast } from 'react-toastify';
 
 import { formatISO9075 } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 const customStyles = {
   content: {
@@ -108,6 +109,12 @@ export default function CalendarEvents({ activities }: ActivityProps) {
     };
   });
 
+  const navigate = useNavigate();
+
+  const refreshPage = () => {
+    navigate(0);
+  };
+
   function openModal() {
     setIsOpen(true);
   }
@@ -139,22 +146,28 @@ export default function CalendarEvents({ activities }: ActivityProps) {
     await api.delete(`/activity/${idEvent}`).then(() => {
       toast.success(`Deleted ${titleEvent}`);
       closeModal();
+      refreshPage();
     });
   }
 
   async function handleUpdateEventCalendar() {
-    await api
-      .put(`/activity/${idEvent}`, {
-        name: titleEvent,
-        description: descriptionEvent,
-        start_date_and_time: new Date(startEvent),
-        end_date_and_time: new Date(endEvent),
-        status: statusEvent,
-      })
-      .then(() => {
-        toast.success('Activity successfully updated');
-        closeModal();
-      });
+    if (new Date(endEvent) <= new Date(startEvent)) {
+      toast.error('Put the end date greater than the start date and one day apart.');
+    } else {
+      await api
+        .put(`/activity/${idEvent}`, {
+          name: titleEvent,
+          description: descriptionEvent,
+          start_date_and_time: new Date(startEvent),
+          end_date_and_time: new Date(endEvent),
+          status: statusEvent,
+        })
+        .then(() => {
+          toast.success('Activity successfully updated');
+          closeModal();
+          refreshPage();
+        });
+    }
   }
   return (
     <div>
@@ -214,16 +227,22 @@ export default function CalendarEvents({ activities }: ActivityProps) {
                         setStatusEvent(e.target.value);
                       }}
                     >
-                      <option value="PENDANT">PENDANT</option>
-                      <option value="COMPLETED">COMPLETED</option>
-                      <option value="CANCELED">CANCELED</option>
+                      <option style={{ background: '#2D3748' }} value="PENDANT">
+                        PENDANT
+                      </option>
+                      <option style={{ background: '#2D3748' }} value="COMPLETED">
+                        COMPLETED
+                      </option>
+                      <option style={{ background: '#2D3748' }} value="CANCELED">
+                        CANCELED
+                      </option>
                     </Select>
                   </SimpleGrid>
                 </VStack>
 
                 <Flex mt="8" justify="flex-end">
                   <HStack spacing="4">
-                    <Button as="a" colorScheme="whiteAlpha" onClick={handleDeleteEventCalendar}>
+                    <Button colorScheme="whiteAlpha" onClick={handleDeleteEventCalendar}>
                       Delete
                       <FaTrash style={{ margin: '0.5rem' }} />
                     </Button>

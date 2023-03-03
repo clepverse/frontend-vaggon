@@ -39,24 +39,37 @@ export function Activities() {
   const cookies = new Cookies();
   const navigate = useNavigate();
 
+  const refreshPage = () => {
+    navigate(0);
+  };
+
   async function handleCreateUser(event: FormEvent) {
     event.preventDefault();
-    await api
-      .post('/activity', {
-        user_id: user.id,
-        name: name,
-        description: description,
-        start_date_and_time: new Date(startDateAndTime),
-        end_date_and_time: new Date(endDateAndTime),
-        status: 'PENDANT',
-      })
-      .then(() => {
-        toast.success('User created successfully.');
-        setName('');
-        setDescription('');
-        setStartDateAndTime('');
-        setEndDateAndTime('');
-      });
+
+    if (endDateAndTime <= startDateAndTime) {
+      toast.error('Put the end date greater than the start date and one day apart.');
+      setStartDateAndTime('');
+      setEndDateAndTime('');
+    } else {
+      await api
+        .post('/activity', {
+          user_id: user.id,
+          name: name,
+          description: description,
+          start_date_and_time: new Date(startDateAndTime),
+          end_date_and_time: new Date(endDateAndTime),
+          status: 'PENDANT',
+        })
+        .then(() => {
+          toast.success('User created successfully.');
+          setName('');
+          setDescription('');
+          setStartDateAndTime('');
+          setEndDateAndTime('');
+
+          refreshPage();
+        });
+    }
   }
 
   function handleCancel() {
@@ -154,14 +167,7 @@ export function Activities() {
           </Box>
         </Flex>
       </Box>
-      <Flex justifyContent={'center'}>
-        {/* <pre>{JSON.stringify(user?.activities, null, 2)}</pre> */}
-        {/* <div>
-          {user?.activities.map((item) => {
-            return <div key={item.id}>{item.name}</div>;
-          })}
-        </div> */}
-      </Flex>
+      <Flex justifyContent={'center'}></Flex>
 
       <CalendarEvents activities={user?.activities} />
     </div>
