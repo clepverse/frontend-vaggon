@@ -66,19 +66,12 @@ export function Activities() {
     setEndDateAndTime('');
   }
 
-  // function getData() {
-  //   const userId = localStorage.getItem('userId');
-  //   return api.get(`/me/${userId}`);
-  // }
-
   useEffect(() => {
     const token = cookies.get('agenda.token');
     if (!token) {
       navigate('/');
     }
   }, []);
-
-  // console.log(user);
 
   return (
     <div>

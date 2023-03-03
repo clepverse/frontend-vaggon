@@ -135,16 +135,9 @@ export default function CalendarEvents({ activities }: ActivityProps) {
     setStatusEvent(status);
   }
 
-  function handleGetExtendPropsCalendar({ description, status }: extendEventsCalendarProps) {
-    setExtendEventsCalendar({
-      description,
-      status,
-    });
-  }
-
   async function handleDeleteEventCalendar() {
     await api.delete(`/activity/${idEvent}`).then(() => {
-      toast.success(`Deleted ${eventsCalendar?.title}`);
+      toast.success(`Deleted ${titleEvent}`);
       closeModal();
     });
   }
@@ -169,7 +162,6 @@ export default function CalendarEvents({ activities }: ActivityProps) {
         <Modal
           ariaHideApp={false}
           isOpen={modalIsOpen}
-          // onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}
           contentLabel="Activities"
           overlayClassName="react-modal-overlay"
@@ -253,7 +245,6 @@ export default function CalendarEvents({ activities }: ActivityProps) {
           plugins={[dayGridPlugin]}
           initialView="dayGridMonth"
           events={{ events }}
-          // events={[{}]}
           locale={ptBrLocale}
           eventClick={(e) => {
             handleGetEventCalendar(

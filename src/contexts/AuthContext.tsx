@@ -73,8 +73,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         .then((response) => {
           const { id, login, activities } = response.data;
 
-          // localStorage.setItem('userActivities', id);
-
           setUser({
             id,
             login,
@@ -121,7 +119,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       navigate('/activities');
     } catch (err) {
-      console.log(err);
       toast.error('E-mail or password incorrect.');
     }
   }
