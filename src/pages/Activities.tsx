@@ -47,8 +47,7 @@ export function Activities() {
     event.preventDefault();
 
     if (endDateAndTime <= startDateAndTime) {
-      toast.error('Put the end date greater than the start date and one day apart.');
-      setStartDateAndTime('');
+      toast.error('Put the end date greater than the start date.');
       setEndDateAndTime('');
     } else {
       await api

@@ -152,7 +152,8 @@ export default function CalendarEvents({ activities }: ActivityProps) {
 
   async function handleUpdateEventCalendar() {
     if (new Date(endEvent) <= new Date(startEvent)) {
-      toast.error('Put the end date greater than the start date and one day apart.');
+      toast.error('Put the end date greater than the start date.');
+      setEndEvent('');
     } else {
       await api
         .put(`/activity/${idEvent}`, {
