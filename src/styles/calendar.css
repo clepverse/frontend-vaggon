@@ -1,0 +1,12 @@
+.fc-event-COMPLETED {
+  background-color: #22c55e !important;
+  border-color: #22c55e !important;
+}
+.fc-event-PENDANT {
+  background-color: #fbbf24 !important;
+  border-color: #fbbf24 !important;
+}
+.fc-event-CANCELED {
+  background-color: #dc2626 !important;
+  border-color: #dc2626 !important;
+}

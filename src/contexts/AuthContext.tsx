@@ -46,11 +46,11 @@ export const AuthContext = createContext({} as AuthContextData);
 
 export function signOut() {
   const cookies = new Cookies();
+  const navigate = useNavigate();
 
   cookies.remove('agenda.token');
   cookies.remove('user.id');
 
-  const navigate = useNavigate();
   navigate('/');
 }
 
@@ -73,7 +73,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         .then((response) => {
           const { id, login, activities } = response.data;
 
-          localStorage.setItem('userActivities', id);
+          // localStorage.setItem('userActivities', id);
 
           setUser({
             id,
@@ -100,7 +100,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { token } = response.data;
 
       cookies.set('user.id', id, {
-        maxAge: 60 * 60 * 24,
+        maxAge: 60 * 60 * 24 * 30,
         path: '/',
       });
 

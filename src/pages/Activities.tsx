@@ -36,10 +36,6 @@ export function Activities() {
   const [startDateAndTime, setStartDateAndTime] = useState<string>();
   const [endDateAndTime, setEndDateAndTime] = useState<string>();
 
-  const [events, setEvents] = useState<any>();
-
-  const [activities, setActivities] = useState();
-
   const cookies = new Cookies();
   const navigate = useNavigate();
 
@@ -47,7 +43,7 @@ export function Activities() {
     event.preventDefault();
     await api
       .post('/activity', {
-        user_id: parseInt(localStorage.getItem('userId')),
+        user_id: user.id,
         name: name,
         description: description,
         start_date_and_time: new Date(startDateAndTime),
@@ -70,20 +66,19 @@ export function Activities() {
     setEndDateAndTime('');
   }
 
-  function getData() {
-    const userId = localStorage.getItem('userId');
-    return api.get(`/me/${userId}`);
-  }
+  // function getData() {
+  //   const userId = localStorage.getItem('userId');
+  //   return api.get(`/me/${userId}`);
+  // }
 
   useEffect(() => {
     const token = cookies.get('agenda.token');
     if (!token) {
-      localStorage.clear();
       navigate('/');
     }
   }, []);
 
-  console.log(user);
+  // console.log(user);
 
   return (
     <div>
@@ -97,7 +92,6 @@ export function Activities() {
             width={'6rem'}
             onClick={(e) => {
               navigate('/');
-              localStorage.clear();
               cookies.remove('agenda.token');
               cookies.remove('user.id');
             }}
@@ -168,15 +162,15 @@ export function Activities() {
         </Flex>
       </Box>
       <Flex justifyContent={'center'}>
-        <pre>{JSON.stringify(user, null, 2)}</pre>
+        {/* <pre>{JSON.stringify(user?.activities, null, 2)}</pre> */}
         {/* <div>
-          {user.activities.map((item) => {
-            return <div>{item.name}</div>;
+          {user?.activities.map((item) => {
+            return <div key={item.id}>{item.name}</div>;
           })}
         </div> */}
       </Flex>
 
-      <CalendarEvents events={events} />
+      <CalendarEvents activities={user?.activities} />
     </div>
   );
 }

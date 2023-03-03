@@ -22,10 +22,9 @@ export function SignUp() {
       })
       .then(() => {
         toast.success('User created successfully.');
+        navigate('/');
       })
       .catch((err) => toast.error('User creation failed.'));
-
-    navigate('/');
   }
 
   return (
