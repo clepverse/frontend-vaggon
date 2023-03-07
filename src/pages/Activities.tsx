@@ -1,6 +1,6 @@
 import { FormEvent, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext, signOut } from '../contexts/AuthContext';
+import { AuthContext } from '../contexts/AuthContext';
 
 import {
   Box,
@@ -20,6 +20,7 @@ import { Logo } from '../components/Logo';
 import CalendarEvents from '../components/CalendarEvents';
 import { api } from '../services/api';
 import { toast } from 'react-toastify';
+import { useForm, SubmitHandler } from 'react-hook-form';
 
 type Activity = {
   name: string;
@@ -30,11 +31,26 @@ type Activity = {
 };
 
 export function Activities() {
-  const { user, isAuthenticated } = useContext(AuthContext);
-  const [name, setName] = useState<string>();
-  const [description, setDescription] = useState<string>();
-  const [startDateAndTime, setStartDateAndTime] = useState<string>();
-  const [endDateAndTime, setEndDateAndTime] = useState<string>();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<Activity>({
+    defaultValues: {
+      name: '',
+      description: '',
+      start_date_and_time: '',
+      end_date_and_time: '',
+      user_id: null,
+    },
+  });
+
+  const { user } = useContext(AuthContext);
+  // const [name, setName] = useState<string>();
+  // const [description, setDescription] = useState<string>();
+  // const [startDateAndTime, setStartDateAndTime] = useState<string>();
+  // const [endDateAndTime, setEndDateAndTime] = useState<string>();
 
   const cookies = new Cookies();
   const navigate = useNavigate();
@@ -43,39 +59,82 @@ export function Activities() {
     navigate(0);
   };
 
-  async function handleCreateUser(event: FormEvent) {
-    event.preventDefault();
-
-    if (endDateAndTime <= startDateAndTime) {
-      toast.error('Put the end date greater than the start date.');
-      setEndDateAndTime('');
+  const handleCreate: SubmitHandler<Activity> = async ({
+    name,
+    description,
+    start_date_and_time,
+    end_date_and_time,
+  }) => {
+    if (!start_date_and_time && !end_date_and_time) {
+      // toast.error('Put the start date and end date.');
     } else {
-      await api
-        .post('/activity', {
-          user_id: user.id,
-          name: name,
-          description: description,
-          start_date_and_time: new Date(startDateAndTime),
-          end_date_and_time: new Date(endDateAndTime),
-          status: 'PENDANT',
-        })
-        .then(() => {
-          toast.success('User created successfully.');
-          setName('');
-          setDescription('');
-          setStartDateAndTime('');
-          setEndDateAndTime('');
+      if (end_date_and_time <= start_date_and_time) {
+        toast.error('Put the end date greater than the start date.');
+        setValue('end_date_and_time', '');
+      } else {
+        await api
+          .post('/activity', {
+            user_id: user.id,
+            name: name,
+            description: description,
+            start_date_and_time: new Date(start_date_and_time),
+            end_date_and_time: new Date(end_date_and_time),
+            status: 'PENDANT',
+          })
+          .then(() => {
+            toast.success('User created successfully.');
+            // setName('');
+            // setDescription('');
+            // setStartDateAndTime('');
+            // setEndDateAndTime('');
 
-          refreshPage();
-        });
+            refreshPage();
+          })
+          .catch((error) => {
+            if (error.response.data.message) {
+              const errors = error.response.data.message;
+              errors.forEach((err: any) => {
+                toast.error(err);
+              });
+            }
+          });
+      }
     }
-  }
+  };
+
+  // async function handleCreateUser(event: FormEvent) {
+  //   event.preventDefault();
+
+  //   if (endDateAndTime <= startDateAndTime) {
+  //     toast.error('Put the end date greater than the start date.');
+  //     setEndDateAndTime('');
+  //   } else {
+  //     await api
+  //       .post('/activity', {
+  //         user_id: user.id,
+  //         name: name,
+  //         description: description,
+  //         start_date_and_time: new Date(startDateAndTime),
+  //         end_date_and_time: new Date(endDateAndTime),
+  //         status: 'PENDANT',
+  //       })
+  //       .then(() => {
+  //         toast.success('User created successfully.');
+  //         setName('');
+  //         setDescription('');
+  //         setStartDateAndTime('');
+  //         setEndDateAndTime('');
+
+  //         refreshPage();
+  //       });
+  //   }
+  // }
 
   function handleCancel() {
-    setName('');
-    setDescription('');
-    setStartDateAndTime('');
-    setEndDateAndTime('');
+    setValue('name', '');
+    setValue('description', '');
+    setValue('start_date_and_time', '');
+    setValue('end_date_and_time', '');
   }
 
   useEffect(() => {
@@ -95,7 +154,7 @@ export function Activities() {
             colorScheme="pink"
             size="lg"
             width={'6rem'}
-            onClick={(e) => {
+            onClick={() => {
               navigate('/');
               cookies.remove('agenda.token');
               cookies.remove('user.id');
@@ -104,6 +163,72 @@ export function Activities() {
             Sign Out
           </Button>
           <Box
+            as="form"
+            flex="1"
+            borderRadius={8}
+            bg="gray.800"
+            p={['6', '8']}
+            onSubmit={handleSubmit(handleCreate)}
+          >
+            <Heading size="lg" fontWeight="normal">
+              Create activity
+            </Heading>
+
+            <Divider my="6" borderColor="gray.700" />
+
+            <VStack spacing={['6', '8']}>
+              <SimpleGrid minChildWidth="240px" spacing="8" w="100%">
+                <Input
+                  name="name"
+                  // value={name}
+                  type="text"
+                  placeholder="Name"
+                  {...register('name')}
+                />
+
+                <Input
+                  name="description"
+                  // value={description}
+                  type="text"
+                  placeholder="Description"
+                  {...register('description')}
+                  // onChange={(e) => setDescription(e.target.value)}
+                />
+              </SimpleGrid>
+              <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+                <Input
+                  name="start_date"
+                  // value={startDateAndTime}
+                  type="datetime-local"
+                  placeholder="Start date"
+                  {...register('start_date_and_time')}
+                  // onChange={(e) => setStartDateAndTime(e.target.value)}
+                />
+                <Input
+                  name="end_date"
+                  // value={endDateAndTime}
+                  type="datetime-local"
+                  placeholder="End date"
+                  {...register('end_date_and_time')}
+                  // onChange={(e) => setEndDateAndTime(e.target.value)}
+                />
+              </SimpleGrid>
+            </VStack>
+
+            <Flex mt="8" justify="flex-end">
+              <HStack spacing="4">
+                <Button as="a" colorScheme="whiteAlpha" onClick={handleCancel}>
+                  Cancel
+                </Button>
+
+                <Button type="submit" colorScheme="pink">
+                  Create
+                </Button>
+              </HStack>
+            </Flex>
+          </Box>
+
+          {/* <Box
             as="form"
             flex="1"
             borderRadius={8}
@@ -163,7 +288,7 @@ export function Activities() {
                 </Button>
               </HStack>
             </Flex>
-          </Box>
+          </Box> */}
         </Flex>
       </Box>
       <Flex justifyContent={'center'}></Flex>

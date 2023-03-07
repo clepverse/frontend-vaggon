@@ -12,16 +12,16 @@ export const api = axios.create({
   },
 });
 
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error: AxiosError) => {
-    if (error.response.status === 401) {
-    } else {
-      signOut();
-    }
+// api.interceptors.response.use(
+//   (response) => {
+//     return response;
+//   },
+//   (error: AxiosError) => {
+//     if (error.response.status === 401) {
+//     } else {
+//       signOut();
+//     }
 
-    return Promise.reject(error);
-  },
-);
+//     return Promise.reject(error);
+//   },
+// );

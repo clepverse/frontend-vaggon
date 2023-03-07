@@ -24,7 +24,14 @@ export function SignUp() {
         toast.success('User created successfully.');
         navigate('/');
       })
-      .catch((err) => toast.error('User creation failed.'));
+      .catch((error) => {
+        if (error.response.data.message) {
+          const errors = error.response.data.message;
+          errors.forEach((err: any) => {
+            toast.error(err);
+          });
+        }
+      });
   }
 
   return (
